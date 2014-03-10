@@ -131,6 +131,16 @@
                      ====================================================================================
                     -->
 
+<% if @require_ds -%>
+                    <Resource name="jdbc/JiraDS" auth="Container" type="javax.sql.DataSource"
+                              driverClassName="<%= scope.lookupvar('jira::dbdriver') %>"
+                              url="<%= scope.lookupvar('jira::dburl') %>"
+                              username="<%= scope.lookupvar('jira::dbuser') %>"
+                              password="<%= scope.lookupvar('jira::dbpassword') %>"
+                              maxActive="<%= scope.lookupvar('jira::poolsize') %>"
+                    />
+<% end -%>
+
                     <Resource name="UserTransaction" auth="Container" type="javax.transaction.UserTransaction"
                               factory="org.objectweb.jotm.UserTransactionFactory" jotm.timeout="60"/>
                     <Manager pathname=""/>

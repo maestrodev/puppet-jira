@@ -33,13 +33,28 @@ class jira::config {
     mode    => '0755',
     require => Class['jira::install'],
     notify  => Class['jira::service'],
-  } ->
+  }
 
-  file { "${jira::homedir}/dbconfig.xml":
-    content => template("jira/dbconfig.${jira::db}.xml.erb"),
-    mode    => '0600',
-    require => [ Class['jira::install'],File[$jira::homedir] ],
-    notify  => Class['jira::service'],
+  if ( versioncmp($jira::version,'5.0') >= 0 ) {
+    file { "${jira::homedir}/dbconfig.xml":
+      content => template("jira/dbconfig.${jira::db}.xml.erb"),
+      mode    => '0600',
+      require => [ Class['jira::install'],File[$jira::homedir] ],
+      notify  => Class['jira::service'],
+    }
+  } else {
+    $require_ds = true
+
+    augeas { 'jira-4-entity':
+      changes => [
+        "set entity-config/datasource/#attribute/field-type-name ${jira::dbtype}",
+        "set entity-config/datasource/#attribute/schema-name public",
+      ],
+      incl    => "${jira::webappdir}/atlassian-jira/WEB-INF/classes/entityengine.xml",
+      lens    => 'Xml.lns',
+      require => [ Class['jira::install'],File[$jira::homedir] ],
+      notify  => Class['jira::service'],
+    }
   }
 
   file { "${jira::webappdir}/conf/server.xml":
