@@ -16,7 +16,7 @@
 class jira::service {
   if $jira::manage_service {
     service { 'jira':
-      ensure    => service_ensure,
+      ensure    => 'running',
       provider  => base,
       start     => '/etc/init.d/jira start',
       restart   => '/etc/init.d/jira restart',
